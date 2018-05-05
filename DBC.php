@@ -1,4 +1,4 @@
-<?php
+ <?php
 /**
  * Database Controller (DBC)
  *
@@ -6,35 +6,20 @@
  * mysqli 模式下只能操作MySQL数据库
  * PDO模式下可以对多种类型的数据库进行操作
  * 所有代替完整SQL语句的方法参数都按照原SQL语句中的顺序出现
- *
- * @var bool linkType 0 => mysqli, 1 => pdo
- * @var string host
- * @var string username
- * @var string passwd
- * @var string dbname
- * @var PDO|mysqli link
- * @var int error
- * @var mysqli_stmt|PDOStatement statement
- * @var
  */
 
+ /**
+  * Class DBCResult
+  */
 class DBCResult
 {
 
-    const
-        DBC_FETCH_NUM = 11,
-        DBC_FETCH_ASSOC = 12,
-        DBC_FETCH_OBJ = 13,
-        DBC_FETCH_ARRAY = 14, // Both num and associate.
-        DBC_FETCH_BOTH = 15,
-        DBC_ERROR_FETCH_ATTR = 101;
-
     private
-        $linkType,
+        $linkType = null,
         $main,
         $error = 0;
 
-    public function __construct(int $linkType,  $obj) {
+    public function __construct(int $linkType, PDOStatement $obj) {
 
         $this->linkType = $linkType;
         $this->main = $obj;
@@ -57,10 +42,25 @@ class DBCResult
                 default:
                     return $this->error = 101;
             }
+        } elseif ($this->linkType == 1) {
+
+            switch ($attr) {
+
+                case 11:
+                    return $this->main->fetch(PDO::FETCH_NUM);
+                case 12:
+                    return $this->main->fetch(PDO::FETCH_ASSOC);
+                case 13:
+                    return $this->main->fetch(PDO::FETCH_OBJ);
+                case 14:
+                    return $this->main->fetch(PDO::FETCH_BOTH);
+                default:
+                    return $this->error = 101;
+            }
         }
     }
 
-    public function fetch_all(int $attr = 11) {
+    public function fetchAll(int $attr = 11) {
 
         if ($this->linkType == 0) {
 
@@ -75,19 +75,180 @@ class DBCResult
                 default:
                     return $this->error = 101;
             }
+        } elseif ($this->linkType == 1) {
+
+            switch ($attr) {
+
+                case 11:
+                    return $this->main->fetchAll(PDO::FETCH_NUM);
+                case 12:
+                    return $this->main->fetchAll(PDO::FETCH_ASSOC);
+                case 13:
+                    return $this->main->fetchAll(PDO::FETCH_OBJ);
+                case 14:
+                    return $this->main->fetchAll(PDO::FETCH_BOTH);
+                default:
+                    return $this->error = 101;
+            }
         }
     }
 
-    public function fieldCount() {
+    public function rowCount() {
 
         if ($this->linkType == 0) {
 
             return $this->main->field_count;
+        } elseif ($this->linkType == 1) {
+
+            return $this->main->rowCount();
         }
     }
 
 }
 
+ /**
+  * Class DBCStatement
+  */
+class DBCStatement {
+
+    private
+        $linkType = null,
+        $main,
+        $arg_num,
+        $error;
+
+    /**
+     * DBCStatement constructor.
+     * @param int $linkType
+     * @param object $obj
+     */
+    public function __construct(int $linkType, object $obj) {
+
+        $this->linkType = $linkType;
+        $this->main = $obj;
+    }
+
+    public function bindParam(string $attr, &...$_) {
+
+        $a = func_get_args();
+        $i = func_num_args();
+
+        if ($this->linkType == 0) {
+
+            call_user_func_array(array($this->main, 'bind_param'), $a);
+            $this->arg_num = $i - 1;
+        } elseif ($this->linkType == 1) {
+
+            call_user_func_array(array($this->main, 'bindParam'), $a);
+        }
+    }
+
+
+    /**
+     * @todo 实现mysqli的bindValue功能
+     */
+    public function bindValue() {
+
+        $a = func_get_args();
+        $i = func_num_args();
+
+        if ($this->linkType == 0) {
+
+            return;
+        } elseif ( $this->linkType == 1) {
+
+            call_user_func_array(array($this->main, 'bindValue'), $a);
+        }
+    }
+
+    public function execute() {
+
+        if ($this->linkType == 0) {
+
+            $this->main->execute();
+        } elseif ($this->linkType == 1) {
+
+            $this->main->execute();
+        }
+    }
+
+    /**
+     * @param $var1
+     * @param array ...$_
+     * @todo 待实现mysqli结果集后废弃
+     */
+    public function bindResult(&$var1, &...$_) {
+
+        $a = func_get_args();
+
+        if ($this->linkType == 0) {
+
+            call_user_func_array(array($this->main, 'bindResult'), $a);
+        } else return;
+    }
+
+    /**
+     * @param int $attr
+     * @return mixed
+     * @todo 实现mysqli->PDO两种方式用相同参数方法拉取数据
+     */
+    public function fetch(int $attr = 11) {
+
+        if ($this->linkType == 0) {
+
+            return $this->main->fetch();
+        } elseif ($this->linkType == 1) {
+
+            switch ($attr) {
+
+                case 11:
+                    return $this->main->fetch(PDO::FETCH_COLUMN);
+                case 12:
+                    return $this->main->fetch(PDO::FETCH_ASSOC);
+                case 13:
+                    return $this->main->fetch(PDO::FETCH_OBJ);
+                case 14:
+                    return $this->main->fetch(PDO::FETCH_BOTH);
+                default:
+                    return $this->error = 101;
+            }
+        } else return 0;
+    }
+
+    /**
+     * @param int $attr
+     * @return mixed
+     * @todo 实现mysqli_stmt的fetchAll()
+     */
+    public function fetchAll(int $attr = 11) {
+
+        if ($this->linkType == 0) {
+
+            return -1;
+        } elseif ($this->linkType == 1) {
+
+            switch ($attr) {
+
+                case 11:
+                    return $this->main->fetchAll(PDO::FETCH_NUM);
+                case 12:
+                    return $this->main->fetchAll(PDO::FETCH_ASSOC);
+                case 13:
+                    return $this->main->fetchAll(PDO::FETCH_OBJ);
+                case 14:
+                    return $this->main->fetchAll(PDO::FETCH_BOTH);
+                default:
+                    return $this->error = 101;
+            }
+        }
+    }
+}
+
+ /**
+  * Class DBC
+  * @todo add 存储过程
+  * @todo add 事务处理
+  */
 class DBC {
 
     private
@@ -96,17 +257,32 @@ class DBC {
         $host,
         $username,
         $passwd,
-        $dbname,
+        $DBName,
         $link,
-        $arg_num,
         $error = 0;
 
     const
-        DBC_CREATE_DB = 101,
-        DBC_CREATE_TABLE = 102,
-        DBC_ERROR_LINKTYPE_MATCH = 23301;
+        LINK_MYSQLI = 0,
+        LINK_PDO = 1,
+        FETCH_NUM = 11,
+        FETCH_ASSOC = 12,
+        FETCH_OBJ = 13,
+        FETCH_ARRAY = 14, // Both num and associate.
+        FETCH_BOTH = 15,
+        CREATE_DB = 101,
+        CREATE_TABLE = 102,
+        ERROR_LINKTYPE_MATCH = 23301,
+        ERROR_FETCH_ATTR = 101;
 
-    function __construct(int $linkType = 0, string $host = '127.0.0.1', string $username = 'root', string $passwd = '', string $dbname = '')  {
+    /**
+     * DBC constructor.
+     * @param int $linkType
+     * @param string $host
+     * @param string $username
+     * @param string $passwd
+     * @param string $DBName
+     */
+    function __construct(int $linkType = 0, string $host = '127.0.0.1', string $username = 'root', string $passwd = '', string $DBName = '')  {
 
         if ($linkType == 0)
             $this->linkType = 0;
@@ -116,10 +292,14 @@ class DBC {
         $this->host = $host;
         $this->username = $username;
         $this->passwd = $passwd;
-        $this->dbname = $dbname;
+        $this->dbname = $DBName;
     }
 
-    public function connect() {
+    /**
+     * @param string|null $DBType
+     * @return int
+     */
+    public function connect(string $DBType = null) {
 
         $a = func_get_args();
         $i = func_num_args();
@@ -150,11 +330,19 @@ class DBC {
         return 0;
     }
 
+    /**
+     * @return int
+     */
     public function errorCode() {
 
         return $this->error;
     }
 
+    /**
+     * @param string $sql
+     * @param string|NULL $index
+     * @return DBCResult
+     */
     public function query(string $sql, string $index = NULL) {
 
         if ($this->linkType == 0) {
@@ -170,6 +358,14 @@ class DBC {
         }
     }
 
+
+    /**
+     * @param string $tableName
+     * @param array $columns
+     * @param string|NULL $param
+     * @param string|NULL $index
+     * @return DBCResult
+     */
     public function select(string $tableName, array $columns, string $param = NULL, string $index = NULL) {
 
         $column = '';
@@ -187,6 +383,12 @@ class DBC {
         return $this->query($sql, $index);
     }
 
+    /**
+     * @param string $tableName
+     * @param array $values
+     * @param string $param
+     * @return null
+     */
     public function update(string $tableName, array $values, string $param) {
 
          $column = '';
@@ -205,6 +407,10 @@ class DBC {
         }
     }
 
+    /**
+     * @param string $tableName
+     * @param array $values
+     */
     public function insert(string $tableName, array $values) {
 
         $col = '';
@@ -221,6 +427,11 @@ class DBC {
         $this->query($sql);
     }
 
+    /**
+     * @param string $tableName
+     * @param string $param
+     * @return int
+     */
     public function delete(string $tableName, string $param) {
 
         if ($param == NULL) {
@@ -233,40 +444,23 @@ class DBC {
         $this->query($sql);
     }
 
+    /**
+     * @param string $sql
+     * @return DBCStatement
+     */
+    public function prepare(string $sql) {
 
-    public function prepare($sql) {
-
-        $this->statement = $this->link->prepare($sql);
+        return new DBCStatement($this->linkType, $this->link->prepare($sql));
     }
 
-    public function bindParam() {
-
-        $a = func_get_args();
-        $i = func_num_args();
-
-        if ($this->linkType == 0) {
-
-            call_user_func_array(array($this->statement, 'bind_param'), $a);
-            $this->arg_num = $i - 1;
-        } elseif ($this->linkType == 1) {
-
-            call_user_func_array(array($this->statement, 'bindParam'), $a);
-        }
-    }
-
-    public function execute() {
-
-        if ($this->linkType == 0) {
-
-            $this->statement->execute();
-        } elseif ($this->linkType == 1) {
-
-            $this->statement->execute();
-        }
-    }
-
-
-
+    /**
+     * @param array $columns
+     * @param string $table1
+     * @param string $table2
+     * @param int $joinType
+     * @param string $param
+     * @return DBCResult
+     */
     public function join(array $columns, string $table1, string $table2, int $joinType, string $param) {
 
         $column = '';
@@ -275,15 +469,24 @@ class DBC {
             $column .= ($col === $column[0]) ? $col : ','.$col;
         }
         $sql = 'SELECT '.$column.' FROM '.$table1.' '.$joinType.' JOIN '.$table2.' WHERE '.$param.';';
-        $this->query($sql);
+        return $this->query($sql);
     }
 
-    public function createDB(string $DBname) {
+    /**
+     * @param string $DBName
+     * @return DBCResult
+     */
+    public function createDB(string $DBName) {
 
-        $sql = 'CREATE DATABASE '.$DBname.';';
-        $this->query($sql);
+        $sql = 'CREATE DATABASE '.$DBName.';';
+        return $this->query($sql);
     }
 
+    /**
+     * @param string $tableName
+     * @param array $columns
+     * @return DBCResult
+     */
     public function createTable(string $tableName, array $columns) {
 
         $sql = 'CREATE TABLE '.$tableName;
@@ -293,19 +496,34 @@ class DBC {
         }
         $sql .= ');';
 
-        $this->query($sql);
+        return $this->query($sql);
     }
-
-//    public function
-
 }
 
-$a = new DBC();
-$cols = array(1, 'abc');
+//$a = new DBC(DBC::LINK_PDO, 'localhost', 'test', 'test', 'runoob_test');
+//$a->connect('mysql');
+//$b = $a->query('select * from websites');
+//var_dump($b->fetch(DBC::FETCH_NUM));
+//$c = $a->prepare('select * from ?');
+//$var = 'websites';
+//$c->bindParam(1, $var);
+//var_dump($c->fetch(DBC::FETCH_BOTH));
+//$cols = array(1, 'abc');
 //$a->update('tableName', $cols, '1=1');
 //$a->select($cols, 'tableName', '1=1');
 //$a->insert('table1', $cols);
 //$a->delete('table1', '1=1');
 //$b = new mysqli('localhost', 'test', 'test', 'runoob_test');
-//$c = $b->query('select * from websites');
-//print_r($c->fetch_row());
+//$c = $b->prepare('select * from websites where id=?');
+//$n = 1;
+//$c->bind
+//$c->execute();$c->bind_param('s', $n);
+//echo $c->field_count;
+//$c->bind_result();
+//$c->f
+//var_dump($a);
+//$d = new PDO('mysql:host=localhost;dbname=runoob_test;', 'test', 'test');
+//$e = $d->prepare('SELECT * FROM ?');
+//$val = 'websites';
+//$e->bindParam(1, $val);
+//print_r($e->r);

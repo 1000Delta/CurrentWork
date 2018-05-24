@@ -2,7 +2,7 @@
 
 if (isset($_GET['echostr'])) {
 
-    $token = '1000DeltaWeixin1000Delta';    //接入token
+    $token = 'weixin';    //接入token
     $info = [$_GET['nonce'], $_GET['timestamp'], $token];
     $echostr = $_GET['echostr'];
 
@@ -16,29 +16,36 @@ if (isset($_GET['echostr'])) {
     }
 } else {
 
-    $data = new SimpleXMLElement($GLOBALS["HTTP_RAW_POST_DATA"], LIBXML_NOCDATA);
-    $getMsgType = $data->MsgType;
-    if (strtolower($getMsgType) === 'text') {
+    $rawData = file_get_contents("php://input");
+    if($rawData != '') {
 
-        $getUserName = $data->FromUserName;
-        $getMyName = $data->ToUserName;
-        $getCreateTime = $data->CreateTime;
-        $getContent = $data->Content;
-        $getMsgId = $data->MsgId;
+        $data = new SimpleXMLElement($rawData, LIBXML_NOCDATA);
+        $getMsgType = $data->MsgType;
+        if (strtolower($getMsgType) === 'text') {
 
-        $timeStamp = time();
-        $str = "<xml>
-            <ToUserName><![CDATA[%s]]></ToUserName> 
-            <FromUserName><![CDATA[%s]]></FromUserName> 
-            <CreateTime>%s</CreateTime> 
-            <MsgType><![CDATA[text]]></MsgType> 
-            <Content><![CDATA[内容是\"%s\"，时间是\"%s\"]]></Content>
-            </xml>";
+            $getUserName = $data->FromUserName;
+            $getMyName = $data->ToUserName;
+            $getCreateTime = $data->CreateTime;
+            $getContent = $data->Content;
+            $getMsgId = $data->MsgId;
+            $msgType = 'text';
+            $timeStamp = time();
+            $str = "<xml>
+                    <ToUserName><![CDATA[%s]]></ToUserName>
+                    <FromUserName><![CDATA[%s]]></FromUserName>
+                    <CreateTime>%s</CreateTime>
+                    <MsgType><![CDATA[%s]]></MsgType>
+                    <Content><![CDATA[内容是\"%s\"，时间是\"%s\"]]></Content>
+                    </xml>";
 
-        echo sprintf($str, $getUserName, $getMyName, $timeStamp, $getContent, $getCreateTime);
+            echo sprintf($str, $getUserName, $getMyName, $timeStamp, $msgType, $getContent, $getCreateTime);
+            exit;
+        } else {
+
+            echo "";
+        }
     }
 
-    exit;
 }
 
-echo "success";
+

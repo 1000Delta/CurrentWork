@@ -1,5 +1,5 @@
 <?php
-require 'WeChatServer/class/DBC.php';
+require 'MyClass/Database/DBC.php';
 $xml = '<xml>
 <ToUserName><![CDATA[toUser]]></ToUserName>
 <FromUserName><![CDATA[fromUser]]></FromUserName>
@@ -21,10 +21,11 @@ $xml = '<xml>
 //preg_match_all('/<(\w*)>(.*)<(\/\w*)>/', $xml, $array);
 //
 //print_r($array);
-$a = new DBC(1, '127.0.0.1', 'root', '1000Delta', 'wechat');
+$a = new MyClass\Database\DBC(0, '127.0.0.1', 'root', '1000Delta', 'wechat');
 $a->connect();
-$rs = $a->select('reply', ['*']);
-foreach ($rs->fetchAll(FETCH_ASSOC_DBC) as $i) {
-
-    print_r($i);
-}
+$rs = $a->select('message', ['*']);
+//foreach ($rs->fetchAll(FETCH_ASSOC_DBC) as $i) {
+//
+//    print_r($i);
+//}
+print_r($rs);

@@ -6,7 +6,7 @@
  * Time: 18:24
  */
 
-namespace MyClass;
+namespace MyClass\WeChat;
 
 class WeChatServe
 {
@@ -88,7 +88,7 @@ class WeChatServe
     public function __construct(string $token) {
 
         $this->token = $token;
-        $this->dbc = new Database\DBC(1, '127.0.0.1', 'root', '1000Delta', 'wechat');
+        $this->dbc = new \MyClass\Database\DBC(1, '127.0.0.1', 'root', '1000Delta', 'wechat');
         $this->dbc->connect();
         $this->dbc->query("SET NAMES UTF8");
 
@@ -154,21 +154,21 @@ class WeChatServe
             case 'text':
                 $this->replyText($data);
                 break;
-            case 'image':
-                $this->replyImage($data);
-                break;
-            case 'voice':
-                $this->replyVoice($data);
-                break;
-            case 'video':
-                $this->replyVideo($data);
-                break;
-            case 'music':
-                $this->replyMusic($data);
-                break;
-            case 'news':
-                $this->replyNews($data);
-                break;
+//            case 'image':
+//                $this->replyImage($data);
+//                break;
+//            case 'voice':
+//                $this->replyVoice($data);
+//                break;
+//            case 'video':
+//                $this->replyVideo($data);
+//                break;
+//            case 'music':
+//                $this->replyMusic($data);
+//                break;
+//            case 'news':
+//                $this->replyNews($data);
+//                break;
             default :
                 return -1;
                 break;
@@ -195,33 +195,33 @@ class WeChatServe
 
     }
 
-    private function replyImage(\SimpleXMLElement $data) { //回复图片消息
-
-        echo "";
-        exit;
-    }
-
-    private function replyVoice(\SimpleXMLElement $data) { //回复语音消息
-
-        echo "";
-        exit;
-    }
-
-    private function replyVideo(\SimpleXMLElement $data) { //回复视频消息
-
-        echo "";
-        exit;
-    }
-
-    private function replyMusic(\SimpleXMLElement $data) { //回复音乐消息
-
-        echo "";
-        exit;
-    }
-
-    private function replyNews(\SimpleXMLElement $data) { //回复图文消息
-
-        echo "";
-        exit;
-    }
+//    private function replyImage(\SimpleXMLElement $data) { //回复图片消息
+//
+//        echo "";
+//        exit;
+//    }
+//
+//    private function replyVoice(\SimpleXMLElement $data) { //回复语音消息
+//
+//        echo "";
+//        exit;
+//    }
+//
+//    private function replyVideo(\SimpleXMLElement $data) { //回复视频消息
+//
+//        echo "";
+//        exit;
+//    }
+//
+//    private function replyMusic(\SimpleXMLElement $data) { //回复音乐消息
+//
+//        echo "";
+//        exit;
+//    }
+//
+//    private function replyNews(\SimpleXMLElement $data) { //回复图文消息
+//
+//        echo "";
+//        exit;
+//    }
 }

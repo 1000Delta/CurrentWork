@@ -1,11 +1,11 @@
 <?php
-require '../MyClass/WeChatServe.php';
-require '../MyClass/Database/DBC.php';
+require '../CodeLib/MyClass/WeChat/WeChatServe.php';
+require '../CodeLib/MyClass/Database/DBC.php';
 
 
 $token = 'weixin';    //接入token
 
-$server = new MyClass\WeChatServe($token);
+$server = new MyClass\WeChat\WeChatServe($token);
 
 if (isset($_GET['echostr'])) {
 

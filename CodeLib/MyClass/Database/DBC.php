@@ -124,7 +124,7 @@ class DBCStatement {
     private
         $linkType = null,
         $main,
-        $arg_num,
+//        $arg_num,
 //        $row = array(),
         $error;
 
@@ -140,21 +140,18 @@ class DBCStatement {
     }
 
     /**
-     * @param string $attr
-     * @param array ...$_
+     * @param $attr
+     * @param $var1
+     * @param null $_
      */
-    public function bindParam(string $attr, &...$_) {
-
-        $a = func_get_args();
-        $i = func_num_args();
+    public function bindParam($attr, &$var1, &$_ = null) {
 
         if ($this->linkType === 0) {
 
-            call_user_func_array(array($this->main, 'bind_param'), $a);
-            $this->arg_num = $i - 1;
+            $this->main->bind_param($attr, $var1, $_);
         } elseif ($this->linkType === 1) {
 
-            call_user_func_array(array($this->main, 'bindParam'), $a);
+            $this->main->bindParam((int)$attr, $var1);
         }
     }
 
@@ -165,7 +162,7 @@ class DBCStatement {
     public function bindValue() {
 
         $a = func_get_args();
-        $i = func_num_args();
+//        $i = func_num_args();
 
         if ($this->linkType === 0) {
 
@@ -274,7 +271,7 @@ class DBC {
         $host,
         $username,
         $passwd,
-        $DBName,
+        $dbName,
         $link,
         $error = 0;
 
@@ -297,9 +294,9 @@ class DBC {
      * @param string $host
      * @param string $username
      * @param string $passwd
-     * @param string $DBName
+     * @param string $dbName
      */
-    function __construct(int $linkType = 0, string $host = '127.0.0.1', string $username = 'root', string $passwd = '', string $DBName = '')  {
+    function __construct(int $linkType = 0, string $host = '127.0.0.1', string $username = 'root', string $passwd = '', string $dbName = '')  {
 
         if ($linkType === 0)
             $this->linkType = 0;
@@ -309,18 +306,18 @@ class DBC {
         $this->host = $host;
         $this->username = $username;
         $this->passwd = $passwd;
-        $this->DBName = $DBName;
+        $this->DBName = $dbName;
     }
 
-    public function changeDB(string $DBName) {}
+    public function changeDB(string $dbName) {}
 
     public function changeUser(string $username, string $password) {}
 
     /**
-     * @param string|null $DBType
+     * @param string|null $dbType
      * @return int
      */
-    public function connect(string $DBType = 'mysql') {
+    public function connect(string $dbType = 'mysql') {
 
         $a = func_get_args();
         $i = func_num_args();
@@ -336,17 +333,17 @@ class DBC {
         if($this->linkType === 0)
             $this->link = new \mysqli($this->host, $this->username, $this->passwd, $this->DBName);
         else
-            $this->link = new \PDO('mysql:host='.$this->host.';dbname='.$this->DBName, $this->username, $this->passwd);
+            $this->link = new \PDO('mysql:host='.$this->host.';dbname='.$this->dbName, $this->username, $this->passwd);
 
         return 0;
     }
     
-    private function connect1(string $DBType) {
+    private function connect1(string $dbType) {
         
         if($this->linkType === 0)
             return $this->error = 23301;
         else
-            $this->link = new \PDO($DBType.':host='.$this->host.';dbname='.$this->dbname, $this->username, $this->passwd);
+            $this->link = new \PDO($dbType.':host='.$this->host.';dbname='.$this->dbName, $this->username, $this->passwd);
 
         return 0;
     }
@@ -408,7 +405,7 @@ class DBC {
      * @param string $tableName
      * @param array $values
      * @param string $param
-     * @return null
+     * @return int|DBCResult
      */
     public function update(string $tableName, array $values, string $param) {
 
@@ -420,17 +417,18 @@ class DBC {
         }
         if ($param === NULL) {
 
-            return NULL;
+            return -1;
         } else {
 
             $sql = 'UPDATE '.$tableName.' SET '.$column.' WHERE '.$param;
-            $this->query($sql);
+            return $this->query($sql);
         }
     }
 
     /**
      * @param string $tableName
      * @param array $values
+     * @return DBCResult
      */
     public function insert(string $tableName, array $values) {
 
@@ -445,24 +443,24 @@ class DBC {
         $col .= ')';
         $val .= ')';
         $sql = "INSERT INTO $tableName $col VALUES $val;";
-        $this->query($sql);
+        return $this->query($sql);
     }
 
     /**
      * @param string $tableName
      * @param string $param
-     * @return int
+     * @return int|DBCResult
      */
     public function delete(string $tableName, string $param) {
 
         if ($param === NULL) {
 
-            return 0;
+            return -1;
         } else {
 
             $sql = "DELETE FROM $tableName WHERE $param";
         }
-        $this->query($sql);
+        return $this->query($sql);
     }
 
     /**
@@ -519,16 +517,16 @@ class DBC {
 
         return $this->query($sql);
     }
+    
+    public function addColumn(string $tableName, string $column, string $dataType) {
+        
+        $result = $this->query('ALTER TABLE '.strtolower($tableName).' ADD '.strtolower($column)." ${dataType}");
+        if ($result->fetchAll()) {
+            
+            return 0;
+        } else {
+            
+            return -1;
+        }
+    }
 }
-
-define('LINK_MYSQLI_DBC', 0);
-define('LINK_PDO_DBC', 1);
-define('FETCH_NUM_DBC', 11);
-define('FETCH_ASSOC_DBC', 12);
-define('FETCH_OBJ_DBC', 13);
-define('FETCH_ARRAY_DBC', 14); // Both num and associate.
-define('FETCH_BOTH_DBC', 15);
-define('CREATE_DB_DBC', 101);
-define('CREATE_TABLE_DBC', 102);
-define('ERROR_LINKTYPE_MATCH_DBC', 23301);
-define('ERROR_FETCH_ATTR_DBC', 23302);

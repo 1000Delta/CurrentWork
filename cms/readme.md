@@ -8,3 +8,24 @@
 
 ## 功能划分
 
+分层模型（流程图）
+
+```flow
+st=>start: Start
+uid=>condition: uid
+passwd=>condition: passwd
+mp=>operation: 主页面
+em=>operation: 文章管理
+logout=>condition: 退出?
+end=>end: End
+
+st->uid
+uid(no)->uid
+uid(yes)->passwd
+passwd(no)->uid
+passwd(yes)->mp
+mp->em->logout
+logout(yes)->end
+logout(no)->mp
+```
+

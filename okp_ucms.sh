@@ -1,3 +1,3 @@
 git add .
 git commit -m "$(date)"
-git push -u origin WeChatServer
+git push -u origin ucms

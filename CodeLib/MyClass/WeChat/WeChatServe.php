@@ -88,7 +88,7 @@ class WeChatServe
     public function __construct(string $token) {
 
         $this->token = $token;
-        $this->dbc = new \MyClass\Database\DBC(1, '127.0.0.1', 'root', '1000Delta', 'wechat');
+        $this->dbc = new \MyClass\Database\DBC(1, '127.0.0.1', 'root', 'root', 'wechat');
         $this->dbc->connect();
         $this->dbc->query("SET NAMES UTF8");
 

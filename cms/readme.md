@@ -8,7 +8,7 @@
 
 ## 功能划分
 
-分层模型（流程图）
+分层模型（流程图）GIthub不支持:(
 
 ```flow
 st=>start: Start

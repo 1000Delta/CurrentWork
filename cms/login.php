@@ -15,8 +15,8 @@
  *  1 -> 用户名错误
  *  2 -> 密码错误
  */
-$uid = $_GET['username'];
-$pass = $_GET['password'];
+$uid = strtolower($_GET['username']);
+$pass = strtolower($_GET['password']);
 $return = ['status' => 0, 'error' => 0];
 
 $db = new \MyClass\Database\DBC(1, '127.0.0.1', 'test', 'test', 'test_cms');
@@ -35,6 +35,7 @@ if(!empty($db)) {
                 $lifetime = 1800;
                 session_set_cookie_params($lifetime);
                 session_start();
+                $_SESSION['uid'] = $uid;
                 $return['status'] = 1;
             } else {
 

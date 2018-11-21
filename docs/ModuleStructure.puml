@@ -1,0 +1,50 @@
+@startuml
+
+'核心类
+abstract class SECoreAbstract {
+- string node
++ abstract string getNode()
+}
+
+class SECore extends SECoreAbstract {
++ string getNode()
+}
+
+'监测类
+interface SEMonitorAbstract {
+- string status
+- string nodeNum
++ abstract string getStatus()
++ abstract string getNodeNum()
+}
+
+class SEMonitor implements SEMonitorAbstract {
++ string getStatus()
++ string getNodeNum()
+}
+
+'查询类
+Interface SEQueryAbstract {
++ abstract array search(string ...$key) 普通查询 多关键词
+}
+
+class SEQuery implements SEQueryAbstract {
++ static array search(...$key)
+}
+
+'管理
+class SE {
++ static SEMonitor monitor()
++ static SEQuery query()
+}
+
+'依赖关系
+SEMonitor ... SECore
+SEQuery ... SECore
+
+'包含关系
+
+SE o--> SEMonitor
+SE o--> SEQuery
+
+@enduml

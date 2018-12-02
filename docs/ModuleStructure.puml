@@ -2,41 +2,49 @@
 
 '核心类
 abstract class SECoreAbstract {
-- string node
-+ abstract string getNode()
+- node:string
++ abstract getNode():string
 }
 
 class SECore extends SECoreAbstract {
 + string getNode()
 }
+'*************************************************************************
 
 '监测类
 interface SEMonitorAbstract {
-- string status
-- string nodeNum
-+ abstract string getStatus()
-+ abstract string getNodeNum()
+'集群相关
+- clusterName:string
+- status:string
+- nodeNum:string
+'节点相关
+- nodeList:array
++ getStatus():string
++ getNodeNum():string
++ getNodeList():array
 }
 
 class SEMonitor implements SEMonitorAbstract {
-+ string getStatus()
-+ string getNodeNum()
++ refresh():void
 }
+'*************************************************************************
 
 '查询类
 Interface SEQueryAbstract {
-+ abstract array search(string ...$key) 普通查询 多关键词
+'普通查询 多关键词
++ abstract search(string ...$key):array
 }
 
 class SEQuery implements SEQueryAbstract {
-+ static array search(...$key)
++ static search(...$key):array
 }
-
+'*************************************************************************
 '管理
 class SE {
 + static SEMonitor monitor()
 + static SEQuery query()
 }
+'*************************************************************************
 
 '依赖关系
 SEMonitor ... SECore

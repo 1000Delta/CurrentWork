@@ -9,11 +9,33 @@
 namespace SE\SECore;
 
 
-class SECoreAbstract {
+abstract class SECoreAbstract {
 
+    /**
+     * @var $instance SECoreAbstract 唯一实例
+     */
+    protected static $instance;
     /**
      * @var $node string 节点地址
      */
-    private $node;
+    protected $node;
 
+    /**
+     * SECoreAbstract constructor.
+     * @param $host string SE主节点地址
+     */
+    protected function __construct($host) {
+
+        $this->node = $host;
+    }
+    
+    public static abstract function get();
+
+    /**
+     * @return string Address of Elasticsearch main node.
+     */
+    public function getNode(): string {
+
+        return $this->node;
+    }
 }

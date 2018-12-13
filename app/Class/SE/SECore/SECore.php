@@ -11,5 +11,16 @@ namespace SE\SECore;
 
 class SECore extends SECoreAbstract {
 
+    /**
+     * @return SECore|SECoreAbstract 本类的唯一实例
+     *
+     */
+    public static function get() {
 
+        if (!self::$instance instanceof self) {
+
+            self::$instance = new self(env('ES_HOST'));
+        }
+        return self::$instance;
+    }
 }

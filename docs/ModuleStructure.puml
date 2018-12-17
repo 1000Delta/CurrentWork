@@ -1,48 +1,70 @@
 @startuml
 
 '核心类
-abstract class SECoreAbstract {
-- node:string
-+ abstract getNode():string
-}
+package SECore <<单例>>{
 
-class SECore extends SECoreAbstract {
-+ string getNode()
+    '
+    abstract class SECoreAbstract {
+
+    - node:string
+    - {static}instance:SECoreAbstract
+    + getNode():string
+    + {static}{abstract}get():SECoreAbstract
+    '防止单例克隆
+    - __clone()
+    }
+
+    class SECore extends SECoreAbstract {
+
+    + {static}get():SECoreAbstract
+    }
 }
 '*************************************************************************
-
 '监测类
-interface SEMonitorAbstract {
-'集群相关
-- clusterName:string
-- status:string
-- nodeNum:string
-'节点相关
-- nodeList:array
-+ getStatus():string
-+ getNodeNum():string
-+ getNodeList():array
-}
+package SEMonitor {
 
-class SEMonitor implements SEMonitorAbstract {
-+ refresh():void
+    abstract class SEMonitorAbstract {
+    - recentTime:int
+    '集群相关
+    - clusterName:string
+    - status:string
+    - nodeNum:int
+    '节点相关
+    - nodeList:array
+    + getCluster():string
+    + getStatus():string
+    + getNodeNum():int
+    + getNodeList():array
+    + recentTime():int
+    + {abstract}refresh():void
+    }
+
+    class SEMonitor extends SEMonitorAbstract {
+    + refresh():void
+    }
 }
 '*************************************************************************
 
 '查询类
-Interface SEQueryAbstract {
-'普通查询 多关键词
-+ abstract search(string ...$key):array
-}
+package SEQuery {
 
-class SEQuery implements SEQueryAbstract {
-+ static search(...$key):array
+    abstract class SEQueryAbstract {
+    '普通查询 多关键词
+    + abstract search(string ...$key):array
+    }
+
+    class SEQuery extends SEQueryAbstract {
+    + static search(...$key):array
+    }
 }
 '*************************************************************************
 '管理
-class SE {
-+ static SEMonitor monitor()
-+ static SEQuery query()
+package SE {
+
+    class SE {
+    + static SEMonitor monitor()
+    + static SEQuery query()
+    }
 }
 '*************************************************************************
 

@@ -9,7 +9,7 @@
 namespace SE\SEMonitor;
 
 
-abstract class SEMonitorAbstract {
+abstract class ASEMonitor {
 
     /**
      * @var int $recentTime 最近刷新时间

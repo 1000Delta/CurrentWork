@@ -9,10 +9,10 @@
 namespace SE\SECore;
 
 
-class SECore extends SECoreAbstract {
+class SECore extends ASECore {
 
     /**
-     * @return SECore|SECoreAbstract 本类的唯一实例
+     * @return SECore|ASECore 本类的唯一实例
      *
      */
     public static function get() {

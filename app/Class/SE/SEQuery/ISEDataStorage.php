@@ -2,13 +2,14 @@
 /**
  * Created by PhpStorm.
  * User: delta
- * Date: 18-11-22
- * Time: 上午12:28
+ * Date: 18-12-27
+ * Time: 下午8:08
  */
 
 namespace SE\SEQuery;
 
 
-class SEQuery extends ASEQuery {
+interface ISEDataStorage {
+
 
 }

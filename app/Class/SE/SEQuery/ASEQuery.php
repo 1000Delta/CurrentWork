@@ -9,6 +9,6 @@
 namespace SE\SEQuery;
 
 
-abstract class SEQueryAbstract {
+abstract class ASEQuery {
 
 }

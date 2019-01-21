@@ -14,7 +14,7 @@ use \GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
 use SE\SECore\SECore;
 
-class SEMonitor extends SEMonitorAbstract {
+class SEMonitor extends ASEMonitor {
 
     public function refresh() {
         // 需要单例SECore

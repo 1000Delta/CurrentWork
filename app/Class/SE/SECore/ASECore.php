@@ -9,10 +9,10 @@
 namespace SE\SECore;
 
 
-abstract class SECoreAbstract {
+abstract class ASECore {
 
     /**
-     * @var $instance SECoreAbstract 唯一实例
+     * @var $instance ASECore 唯一实例
      */
     protected static $instance;
     /**

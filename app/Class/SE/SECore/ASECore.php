@@ -9,6 +9,8 @@
 namespace SE\SECore;
 
 
+use http\Client;
+
 abstract class ASECore {
 
     /**
@@ -37,5 +39,16 @@ abstract class ASECore {
     public function getNode(): string {
 
         return $this->node;
+    }
+    
+    /**
+     * @return
+     */
+    public function getLink() {
+    
+        return new \GuzzleHttp\Client([
+            'base_uri' => $this->getNode(),
+            'time_out' => 2.0
+        ]);
     }
 }

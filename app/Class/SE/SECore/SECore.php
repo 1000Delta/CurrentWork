@@ -12,6 +12,7 @@ namespace SE\SECore;
 class SECore extends ASECore {
 
     /**
+     * 获取单例
      * @return SECore|ASECore 本类的唯一实例
      *
      */

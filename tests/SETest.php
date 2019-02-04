@@ -81,4 +81,14 @@ class SETest extends TestCase {
 //        }
         self::assertTrue(true);
     }
+    
+    public function testTMP() {
+    
+        // todo 找不到phpunit 需要添加至path
+        $obj = new \SE\SEQuery\SEData\SEDataEssay();
+        $obj->index = 1;
+        $obj->title = '标题';
+        $obj->main = '正文';
+        var_dump(get_object_vars($obj));
+    }
 }

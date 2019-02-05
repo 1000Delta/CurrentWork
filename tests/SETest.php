@@ -84,7 +84,6 @@ class SETest extends TestCase {
     
     public function testTMP() {
     
-        // todo 找不到phpunit 需要添加至path
         $obj = new \SE\SEQuery\SEData\SEDataEssay();
         $obj->index = 1;
         $obj->title = '标题';

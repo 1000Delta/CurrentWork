@@ -49,22 +49,48 @@ package SEMonitor {
     }
 }
 '*************************************************************************
-
 '请求类
 package SEQuery {
 
-    interface ISEDataWriter {
+    interface SEDataWriter {
 
-        array addIndex()
+        + add():int
+        + mod():void
+        + del():void
+
     }
 
-    abstract class ASEQuery implements ISEDataWriter, ISEDataReader {
+    interface SEDataReader {
+
+        + search($key):array
+        + read($index):SEData
+    }
+
+    abstract class ASEQuery implements SEDataWriter, SEDataReader {
     '普通查询 多关键词
     + {abstract}search(string ...$key):array
     }
 
     class SEQuery extends ASEQuery {
     + search(...$key):array
+    }
+}
+'数据对象
+package SEData {
+
+    interface SEData {
+
+    }
+
+    class SEDataEssay implements SEData {
+
+        - $index:int
+        - $title:string
+        - $main:string
+
+        + getter()...
+        + setter()...
+
     }
 }
 '*************************************************************************
@@ -81,6 +107,7 @@ package SE {
 '依赖关系
 SEMonitor ... SECore
 SEQuery ... SECore
+SEQuery ... SEData
 
 '包含关系
 

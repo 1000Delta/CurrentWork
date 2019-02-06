@@ -9,7 +9,6 @@
 namespace SE\SEQuery;
 
 
-use http\Exception\UnexpectedValueException;
 use SE\SECore\SECore;
 use SE\SEQuery\SEData\ISEData;
 

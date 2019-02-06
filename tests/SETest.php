@@ -83,41 +83,7 @@ class SETest extends TestCase {
     }
     
     public function testTMP() {
-    
-        $obj = new Tmp(2);
-        $obj->f(1, 2, 3);
-        echo $obj->var;
+
         self::assertTrue(true);
-    }
-}
-
-class Tmp {
-
-    public $var;
-
-    function f() {
-
-        $args = func_get_args();
-        $i = count($args);
-
-        switch ($i) {
-
-            case 1:
-                call_user_func([$this, 'f1'], $args);
-                break;
-            case 2:
-                call_user_func_array([$this, 'f2'], $args);
-                break;
-        }
-    }
-
-    function f1($a1) {
-
-        $this->var = 'one';
-    }
-
-    function f2($a1, $a2) {
-
-        $this->var = 'two';
     }
 }

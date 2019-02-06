@@ -35,28 +35,56 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
      * @var ISEData 指定的数据对象类型
      */
     private $data;
-    
+
     /**
+     *多态构造器
      * ASEQuery constructor.
-     * @param ISEData $data
+     * 通过 func_get_args 和 call_user_func
      */
-    public function __construct(ISEData $data) {
-    
+    public function __construct() {
+
+        $a = func_get_args();
+        $i = count($a);
+
+        switch ($i) {
+
+            case 1:
+
+                call_user_func([$this, '__constructR'], $a);
+                break;
+            case 3:
+                call_user_func([$this, '__constructW'], $a);
+                break;
+            default:
+                throw new \InvalidArgumentException(
+                    'Wrong arguments numbers.'
+                );
+        }
+    }
+
+    public function __constructW($index, $type, $data) {
+
+        $this->index = $index;
+        $this->type = $type;
         $this->data = $data;
     }
-    
-    public function add($data): int {
-        // TODO: Implement add() method.
+
+    public function __constructR($data) {
+
+        $this->type = $data;
+    }
+
+    public function add($data) {
+
         if ($this->index != '' && $this->type != '') {
         
             SECore::get()->getLink()->post('/'.$this->index.'/'.$this->type, [
-                // todo 数据对象转化成数组json问题
-                // 'json' =>
+                 'json' => get_object_vars($data)
             ]);
             
         } else {
         
-            throw new UnexpectedValueException('未指定索引或数据类型');
+            throw new \InvalidArgumentException('实例未指定针对的索引或数据类型');
         }
     }
     

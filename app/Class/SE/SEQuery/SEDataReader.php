@@ -8,7 +8,16 @@
 
 namespace SE\SEQuery;
 
+use SE\SEQuery\SEData\ISEData;
+
 interface SEDataReader {
+
+    /**
+     * 查询器构造函数
+     * @param $data ISEData 查询器实例
+     * @return $this 查询器实例
+     */
+    public function __constructR($data);
 
     /**
      * 搜索接口

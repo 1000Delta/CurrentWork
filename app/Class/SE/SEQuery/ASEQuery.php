@@ -24,16 +24,17 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
     /**
      * @var $index string 需要读取数据的索引
      */
-    private $index;
+    protected $index;
     
     /**
      * @var $type string 指定索引中的数据类型
      */
-    private $type;
+    protected $type;
+
     /**
      * @var ISEData 指定的数据对象类型
      */
-    private $data;
+    protected $data;
 
     /**
      *多态构造器
@@ -75,11 +76,19 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
 
     public function add($data) {
 
-        if ($this->index != '' && $this->type != '') {
+        if ($this->isWriter()) {
         
-            SECore::get()->getLink()->post('/'.$this->index.'/'.$this->type, [
+            $response = SECore::get()->getLink()->post(
+                '/'.$this->index.'/'.$this->type, [
                  'json' => get_object_vars($data)
             ]);
+            $result = $response->getBody();
+            $json = json_decode($result, true);
+            // todo 待完善错误处理
+            if ($json['result'] != 'created') {
+
+                throw new \ErrorException('操作有误');
+            }
             
         } else {
         
@@ -88,6 +97,60 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
     }
     
     public function mod($id, $data): void {
-        // TODO: Implement mod() method.
+
+        if ($this->isWriter()) {
+
+            $response = SECore::get()->getLink()->put(
+                '/'.$this->index.'/'.$this->type.'/'.$id, [
+                    'json' => get_object_vars($data)
+            ]);
+            $result = $response->getBody();
+            $json = json_decode($result, true);
+            // todo 待完善错误处理
+            if ($json['result'] != 'updated') {
+
+                throw new \ErrorException('操作有误');
+            }
+        } else {
+
+            throw new \InvalidArgumentException('实例未指定针对的索引或数据类型');
+        }
+    }
+
+    public function del($id) {
+        if ($this->isWriter()) {
+
+            $result = SECore::get()->getLink()->delete('/'.$this->index.'/'.$this->type.'/'.$id)->getBody();
+            $json = json_decode($result, true);
+            // todo 待完善错误处理
+            if ($json['result'] != 'deleted') {
+
+                throw new \ErrorException('操作有误');
+            }
+        } else {
+
+            throw new \InvalidArgumentException('实例未指定针对的索引或数据类型');
+        }
+    }
+
+    public function search($key) {
+        // TODO: Implement search() method.
+    }
+
+    /**
+     * 封装写入参数判断逻辑
+     * @return boolean 判断的结果
+     */
+    protected function isWriter() {
+
+        return $this->index != '' & $this->type != '';
+    }
+
+    protected function getResultCode($result) {
+
+        // todo 错误处理
+        $result2code = [
+            ''
+        ];
     }
 }

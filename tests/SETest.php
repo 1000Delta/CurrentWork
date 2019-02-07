@@ -35,10 +35,8 @@ class SETest extends TestCase {
         // 刷新过快，需要延时至少一秒
         sleep(1);
         $time2 = $monitor->refresh()->getRecentTime();
+
         $this->assertNotEquals($time1, $time2);
-
-        /********** 临时测试区 ***********/
-
     }
 
     public function testQuery() {
@@ -55,34 +53,16 @@ class SETest extends TestCase {
 
     public function testSetting() {
 
-        $client = new \GuzzleHttp\Client([
-            'base_uri' => '127.0.0.1:9200',
-            'time_out' => 5.0
-        ]);
-        $shardList = $client->get('/_cat/shards')->getBody();
-        preg_match_all('/([\.\-\w]*) *\d* \w* UNASSIGNED/', $shardList, $unaList);
-        $indexList = array_unique($unaList[1]);
-        foreach ($indexList as $index) {
-
-            preg_match_all('/'.$index.' *(\d*) \w* UNASSIGNED/', $shardList, $unaList);
-        }
-        //todo 数组去重
-        print_r($unaList);
-        //        for ($i = 0; $i < count($unaList[0]); $i++) {
-//
-//            $client->post('/_cluster/reroute', [
-//                'json' => [
-//                    'index' => $unaList[1][$i],
-//                    'shard' => $unaList[2][$i],
-//                    'node' => 'local-ubuntu-1',
-//                    'allow_primary' => true
-//                ]
-//            ]);
-//        }
         self::assertTrue(true);
     }
     
     public function testTMP() {
+
+        function cc($a, $b, $c) {
+
+            echo $a, $b, $c;
+        }
+        call_user_func_array('cc', [1,2,3]);
 
         self::assertTrue(true);
     }

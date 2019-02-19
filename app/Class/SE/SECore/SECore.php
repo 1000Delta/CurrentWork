@@ -20,7 +20,13 @@ class SECore extends ASECore {
 
         if (!self::$instance instanceof self) {
 
-            self::$instance = new self(env('ES_HOST'));
+            if (null !== env('ES_HOST')) {
+    
+                self::$instance = new self(env('ES_HOST'));
+            } else {
+                
+                throw new \InvalidArgumentException('Invalid environment argument "ES_HOST" in "/.env".');
+            }
         }
         return self::$instance;
     }

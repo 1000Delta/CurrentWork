@@ -10,7 +10,7 @@ namespace SE\SEQuery;
 
 
 use SE\SECore\SECore;
-use SE\SEQuery\SEData\ISEData;
+use SE\SEError\SEError;
 
 /**
  * Class ASEQuery 数据请求器
@@ -30,53 +30,21 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
      * @var $type string 指定索引中的数据类型
      */
     protected $type;
-
+    
     /**
-     * @var ISEData 指定的数据对象类型
-     */
-    protected $data;
-
-    /**
-     *多态构造器
      * ASEQuery constructor.
-     * 通过 func_get_args 和 call_user_func
+     * @param $index string
+     * @param $type string
      */
-    public function __construct() {
-
-        $a = func_get_args();
-        $i = count($a);
-
-        switch ($i) {
-
-            case 1:
-
-                call_user_func([$this, '__constructR'], $a);
-                break;
-            case 3:
-                call_user_func([$this, '__constructW'], $a);
-                break;
-            default:
-                throw new \InvalidArgumentException(
-                    'Wrong arguments numbers.'
-                );
-        }
-    }
-
-    public function __constructW($index, $type, $data) {
+    public function __construct($index, $type) {
 
         $this->index = $index;
         $this->type = $type;
-        $this->data = $data;
-    }
-
-    public function __constructR($data) {
-
-        $this->type = $data;
     }
 
     public function add($data) {
 
-        if ($this->isWriter()) {
+        if ($this->notNull()) {
         
             $response = SECore::get()->getLink()->post(
                 '/'.$this->index.'/'.$this->type, [
@@ -84,12 +52,10 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
             ]);
             $result = $response->getBody();
             $json = json_decode($result, true);
-            // todo 待完善错误处理
             if ($json['result'] != 'created') {
 
-                throw new \ErrorException('操作有误');
+                SEError::query($json);
             }
-            
         } else {
         
             throw new \InvalidArgumentException('实例未指定针对的索引或数据类型');
@@ -98,7 +64,7 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
     
     public function mod($id, $data): void {
 
-        if ($this->isWriter()) {
+        if ($this->notNull()) {
 
             $response = SECore::get()->getLink()->put(
                 '/'.$this->index.'/'.$this->type.'/'.$id, [
@@ -106,10 +72,9 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
             ]);
             $result = $response->getBody();
             $json = json_decode($result, true);
-            // todo 待完善错误处理
             if ($json['result'] != 'updated') {
 
-                throw new \ErrorException('操作有误');
+                SEError::query($json);
             }
         } else {
 
@@ -118,39 +83,53 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
     }
 
     public function del($id) {
-        if ($this->isWriter()) {
+        if ($this->notNull()) {
 
             $result = SECore::get()->getLink()->delete('/'.$this->index.'/'.$this->type.'/'.$id)->getBody();
             $json = json_decode($result, true);
             // todo 待完善错误处理
             if ($json['result'] != 'deleted') {
-
-                throw new \ErrorException('操作有误');
+            
+                SEError::query($json);
             }
         } else {
-
+    
             throw new \InvalidArgumentException('实例未指定针对的索引或数据类型');
         }
     }
 
-    public function search($key) {
+    public function search($keyMap) {
         // TODO: Implement search() method.
+        if ($this->notNull()) {
+    
+            $queryMap = [];
+            foreach ($keyMap as $k => $v) {
+        
+                $queryMap[] =  ['match' => [$k => $v]];
+            }
+            $link = SECore::get()->getLink()->get($this->index.'/'.$this->type, [
+                'json' => [
+                    'query' => [
+                        'dis_max' => [
+                            'queries' => $queryMap
+                        ]
+                    ]
+                ]
+            ]);
+            $data = json_decode($link->getBody());
+        } else {
+    
+            throw new \InvalidArgumentException('实例未指定针对的索引或数据类型');
+        }
     }
 
     /**
      * 封装写入参数判断逻辑
      * @return boolean 判断的结果
      */
-    protected function isWriter() {
+    protected function notNull() {
 
-        return $this->index != '' & $this->type != '';
-    }
-
-    protected function getResultCode($result) {
-
-        // todo 错误处理
-        $result2code = [
-            ''
-        ];
+        // 索引和类型参数不为空
+        return $this->index != '' && $this->type != '';
     }
 }

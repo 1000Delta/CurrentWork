@@ -55,6 +55,7 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
             if ($json['result'] != 'created') {
 
                 SEError::query($json);
+                return;
             }
         } else {
         
@@ -75,6 +76,7 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
             if ($json['result'] != 'updated') {
 
                 SEError::query($json);
+                return;
             }
         } else {
 
@@ -87,27 +89,66 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
 
             $result = SECore::get()->getLink()->delete('/'.$this->index.'/'.$this->type.'/'.$id)->getBody();
             $json = json_decode($result, true);
-            // todo 待完善错误处理
             if ($json['result'] != 'deleted') {
             
                 SEError::query($json);
+                return;
             }
         } else {
     
             throw new \InvalidArgumentException('实例未指定针对的索引或数据类型');
         }
     }
-
-    public function search($keyMap) {
-        // TODO: Implement search() method.
-        if ($this->notNull()) {
     
+    // 不支持翻页，弃用
+    // public function search($keyMap) {
+    //
+    //     if ($this->notNull()) {
+    //
+    //         $queryMap = [];
+    //         foreach ($keyMap as $k => $v) {
+    //
+    //             $queryMap[] = ['match' => [$k => $v]];
+    //         }
+    //         $link = SECore::get()->getLink()->get($this->index.'/'.$this->type.'/_search', [
+    //             'json' => [
+    //                 'query' => [
+    //                     'dis_max' => [
+    //                         'queries' => $queryMap
+    //                     ]
+    //                 ]
+    //             ]
+    //         ]);
+    //         $data = json_decode($link->getBody(), true);
+    //         try {
+    //
+    //             $list = $data['hits']['hits'];
+    //             return $list;
+    //
+    //         } catch (\ErrorException $e) {
+    //
+    //             SEError::query($data);
+    //         }
+    //     } else {
+    //
+    //         throw new \InvalidArgumentException('实例未指定针对的索引或数据类型');
+    //     }
+    //     // 错误结果默认抛出空数组
+    //     return [];
+    // }
+    
+    public function pageSearch($from, $size, $keyMap) {
+
+        if ($this->notNull()) {
+        
+            // 将 搜索字段=>关键字 映射修改成搜索需要的格式
             $queryMap = [];
             foreach ($keyMap as $k => $v) {
-        
-                $queryMap[] =  ['match' => [$k => $v]];
+            
+                $queryMap[] = ['match' => [$k => $v]];
             }
-            $link = SECore::get()->getLink()->get($this->index.'/'.$this->type, [
+            // 最佳字段查询优化dis_max
+            $link = SECore::get()->getLink()->get($this->index.'/'.$this->type.'/_search?from='.$from.'&size='.$size, [
                 'json' => [
                     'query' => [
                         'dis_max' => [
@@ -116,13 +157,25 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
                     ]
                 ]
             ]);
-            $data = json_decode($link->getBody());
-        } else {
+            $data = json_decode($link->getBody(), true);
+            try {
     
+                // 返回成功查询的完整结果，由控制器进行后续处理
+                $list = $data['hits']['hits'];
+                return $list;
+                
+            } catch (\ErrorException $e) { // 捕获数组索引不存在的错误（即查询失败）
+            
+                SEError::query($data);
+            }
+        } else {
+        
             throw new \InvalidArgumentException('实例未指定针对的索引或数据类型');
         }
+        // 错误结果默认抛出空数组
+        return [];
     }
-
+    
     /**
      * 封装写入参数判断逻辑
      * @return boolean 判断的结果

@@ -12,14 +12,6 @@ namespace SE\SEQuery;
 use SE\SEQuery\SEData\ISEData;
 
 interface SEDataWriter {
-    
-    /**
-     * 数据写入器构造器
-     * @param $index string 指定数据索引
-     * @param $type string 制定索引中的数据类型
-     * @return $this 写入器实例
-     */
-    public function __constructW($index, $type);
 
     /**
      * 写入数据

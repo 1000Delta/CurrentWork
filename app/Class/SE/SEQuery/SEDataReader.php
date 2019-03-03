@@ -11,13 +11,14 @@ namespace SE\SEQuery;
 interface SEDataReader {
     
     /**
-     * 搜索接口 弃用
+     * 搜索接口
+     * @param $size int 显示搜索结果数
      * @param $keyMap array 搜索字段与关键字组成的关联数组
      * @return array 搜索结果列表
      *
      * 提供搜索功能
      */
-    // public function search($keyMap);
+    public function search($size, $keyMap);
     
     /**
      * 分页搜索

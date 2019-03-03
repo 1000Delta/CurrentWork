@@ -100,42 +100,11 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
         }
     }
     
-    // 不支持翻页，弃用
-    // public function search($keyMap) {
-    //
-    //     if ($this->notNull()) {
-    //
-    //         $queryMap = [];
-    //         foreach ($keyMap as $k => $v) {
-    //
-    //             $queryMap[] = ['match' => [$k => $v]];
-    //         }
-    //         $link = SECore::get()->getLink()->get($this->index.'/'.$this->type.'/_search', [
-    //             'json' => [
-    //                 'query' => [
-    //                     'dis_max' => [
-    //                         'queries' => $queryMap
-    //                     ]
-    //                 ]
-    //             ]
-    //         ]);
-    //         $data = json_decode($link->getBody(), true);
-    //         try {
-    //
-    //             $list = $data['hits']['hits'];
-    //             return $list;
-    //
-    //         } catch (\ErrorException $e) {
-    //
-    //             SEError::query($data);
-    //         }
-    //     } else {
-    //
-    //         throw new \InvalidArgumentException('实例未指定针对的索引或数据类型');
-    //     }
-    //     // 错误结果默认抛出空数组
-    //     return [];
-    // }
+    public function search($size, $keyMap) {
+    
+        // 简化分页搜索，仅返回第一页结果
+        return $this->pageSearch(0, $size, $keyMap);
+    }
     
     public function pageSearch($from, $size, $keyMap) {
 

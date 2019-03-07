@@ -14,12 +14,18 @@ use Illuminate\Support\Facades\Log;
 class SEError implements ISEError {
 
     public static function query($rtnData) {
-        // TODO: Implement query() method.
-        Log::error('result: '.$rtnData['result']);
+
+        Log::error('result: '.$rtnData['result'], $rtnData);
+    }
+    
+    public static function search($rtnData) {
+
+        Log::error('result: ', $rtnData);
+        
     }
     
     public static function cluster($rtnData) {
-        // TODO: Implement cluster() method.
-        // if
+
+        Log::error('result: '.$rtnData['result'], $rtnData);
     }
 }

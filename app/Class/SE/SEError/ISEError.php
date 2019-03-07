@@ -21,8 +21,15 @@ interface ISEError {
     public static function query($rtnData);
     
     /**
+     * 处理搜索时的错误信息
+     * @param $rtnData array 出现错误的搜索结果
+     * @return void
+     */
+    public static function search($rtnData);
+    
+    /**
      * 处理集群出现的错误
-     * @param $rtnData ISEData 出现错误的返回数据对象
+     * @param $rtnData array 出现错误的返回数据对象
      * @return void
      */
     public static function cluster($rtnData);

@@ -9,20 +9,18 @@
 namespace SE\SEQuery\SEData;
 
 
-class SEDataEssay implements ISEData {
-    
-    /**
-     * @var int $index 索引
-     */
-    public $index;
-    
-    /**
-     * @var string $title 文章标题
-     */
-    public $title;
-    
-    /**
-     * @var string $main 文章正文
-     */
-    public $main;
+class SEDataLink implements ISEData {
+
+    public static function getMap($key) {
+
+        return [
+            'keyword' => $key,
+            'title' => $key,
+            'url' => $key,
+            'intro' => $key,
+            'content' => $key,
+            'tags' => $key,
+            'note' => $key
+        ];
+    }
 }

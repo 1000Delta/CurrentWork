@@ -16,5 +16,11 @@ namespace SE\SEQuery\SEData;
  * 细化数据类型由各实现抽象类进行完善
  */
 interface ISEData {
-
+    
+    /**
+     * 获取搜索映射
+     * @param $key string 类型搜索关键字
+     * @return array 字段-关键字映射
+     */
+    public static function getMap($key);
 }

@@ -12,5 +12,20 @@
 */
 
 $router->get('/', function () use ($router) {
+    
     return $router->app->version();
 });
+
+/**
+ * 搜索API，提供分页搜索功能
+ * @api /search
+ * path /api/search/
+ */
+$router->get('/search/{key}[/{page}]', 'SearchController@search');
+
+/**
+ * 更新API，对接爬虫进行数据更新
+ * @api /update
+ */
+$router->post('/update', 'UpdateController@update');
+

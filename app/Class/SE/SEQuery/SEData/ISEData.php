@@ -22,5 +22,11 @@ interface ISEData {
      * @param $key string 类型搜索关键字
      * @return array 字段-关键字映射
      */
-    public static function getMap($key);
+    public static function getSearchMap($key);
+    
+    /**
+     * @param array $keyMap 待匹配的数据项数组
+     * @return bool 匹配的结果，成功返回true, 失败返回false
+     */
+    public static function isMatch($keyMap);
 }

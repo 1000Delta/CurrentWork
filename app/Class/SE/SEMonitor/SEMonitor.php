@@ -9,7 +9,6 @@
 namespace SE\SEMonitor;
 
 
-use GuzzleHttp\Client;
 use \GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
 use SE\SECore\SECore;
@@ -18,7 +17,7 @@ class SEMonitor extends ASEMonitor {
 
     public function refresh() {
         // 需要单例SECore
-        $client = new Client(['base_uri' => SECore::get()->getNode()]);
+        $client = SECore::get()->getLink();
         try {
 
             $responseHealth = $client->request('GET', '/_cluster/health');

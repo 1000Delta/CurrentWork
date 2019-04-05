@@ -11,6 +11,7 @@ namespace SE\SEQuery;
 
 use SE\SECore\SECore;
 use SE\SEError\SEError;
+use SE\SEQuery\SEData\SEDataLink;
 
 /**
  * Class ASEQuery 数据请求器
@@ -40,15 +41,23 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
 
         $this->index = $index;
         $this->type = $type;
+        
+        // todo: 添加针对索引和类型的存在性检测
+        $link = SECore::get()->getLink()->get('/'.$index);
     }
 
     public function add($data) {
 
         if ($this->notNull()) {
         
+            // 检测数据是否匹配类型
+            if (!SEDataLink::isMatch($data)) {
+                
+                throw new \InvalidArgumentException('传入数据与数据类型不匹配');
+            }
             $response = SECore::get()->getLink()->post(
                 '/'.$this->index.'/'.$this->type, [
-                 'json' => get_object_vars($data)
+                 'json' => $data
             ]);
             $result = $response->getBody();
             $json = json_decode($result, true);
@@ -65,11 +74,12 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
     
     public function mod($id, $data): void {
 
+        
         if ($this->notNull()) {
 
             $response = SECore::get()->getLink()->put(
                 '/'.$this->index.'/'.$this->type.'/'.$id, [
-                    'json' => get_object_vars($data)
+                    'json' => $data
             ]);
             $result = $response->getBody();
             $json = json_decode($result, true);
@@ -100,22 +110,19 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
         }
     }
     
-    public function search($size, $keyMap) {
+    public function search(int $size, string $key) {
     
         // 简化分页搜索，仅返回第一页结果
-        return $this->pageSearch(0, $size, $keyMap);
+        return $this->pageSearch(0, $size, $key);
     }
     
-    public function pageSearch($from, $size, $keyMap) {
+    public function pageSearch(int $from, int $size, string $key) {
 
         if ($this->notNull()) {
         
             // 将 搜索字段=>关键字 映射修改成搜索需要的格式
-            $queryMap = [];
-            foreach ($keyMap as $k => $v) {
-            
-                $queryMap[] = ['match' => [$k => $v]];
-            }
+            // 使用 SEDataLink 类型的静态方法
+            $queryMap = SEDataLink::getSearchMap($key);
             // 最佳字段查询优化dis_max
             $link = SECore::get()->getLink()->get($this->index.'/'.$this->type.'/_search?from='.$from.'&size='.$size, [
                 'json' => [

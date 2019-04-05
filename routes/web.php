@@ -29,3 +29,7 @@ $router->get('/search/{key}[/{page}]', 'SearchController@search');
  */
 $router->post('/update', 'UpdateController@update');
 
+$router->group(['middleware' => 'CorsMiddleware'], function () use ($router) {
+    
+    $router->get('/test', 'UpdateController@test');
+});

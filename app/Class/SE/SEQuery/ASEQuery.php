@@ -42,8 +42,27 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
         $this->index = $index;
         $this->type = $type;
         
-        // todo: 添加针对索引和类型的存在性检测
+        // 索引检测
         $link = SECore::get()->getLink()->get('/'.$index);
+        $data = json_decode($link->getBody(), true);
+        $errMsg = '';
+        if (!array_key_exists($index, $data) && array_key_exists('status', $data)) {
+            
+            $errMsg = '索引无效, 错误代码:'.$data['status'];
+        }
+    
+        $link = SECore::get()->getLink()->get('/'.$index.'/_mapping');
+        $data = json_decode($link->getBody(), true);
+        if (!array_key_exists($type, $data['link']['mappings'])) {
+            
+            $errMsg = '索引中指定类型不存在! ';
+        }
+        // 类型检测
+        // 错误时抛出异常强行结束请求器构建
+        if ($errMsg !== '') {
+    
+            throw new \RuntimeException($errMsg);
+        }
     }
 
     public function add($data) {
@@ -134,14 +153,13 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
                 ]
             ]);
             $data = json_decode($link->getBody(), true);
-            try {
-    
+            if (!array_key_exists('hits', $data)) {
                 // 返回成功查询的完整结果，由控制器进行后续处理
-                $list = $data['hits']['hits'];
-                return $list;
+                return $data['hits'];
                 
-            } catch (\ErrorException $e) { // 捕获数组索引不存在的错误（即查询失败）
+            } else {
             
+                // 记录错误数据
                 SEError::query($data);
             }
         } else {

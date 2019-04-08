@@ -9,6 +9,7 @@
 namespace SE\SEQuery;
 
 
+use GuzzleHttp\Exception\ClientException;
 use SE\SECore\SECore;
 use SE\SEError\SEError;
 use SE\SEQuery\SEData\SEDataLink;
@@ -42,22 +43,21 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
         $this->index = $index;
         $this->type = $type;
         
-        // 索引检测
-        $link = SECore::get()->getLink()->get('/'.$index);
-        $data = json_decode($link->getBody(), true);
+        // 检测参数有效性，连接到ES引擎
         $errMsg = '';
-        if (!array_key_exists($index, $data) && array_key_exists('status', $data)) {
-            
-            $errMsg = '索引无效, 错误代码:'.$data['status'];
-        }
+        // 索引检测
+        try {
+            // 类型检测
+            $link = SECore::get()->getLink()->get('/'.$index.'/_mapping');
+            $data = json_decode($link->getBody(), true);
+            if (!array_key_exists($type, $data['link']['mappings'])) {
+                
+                $errMsg = '索引中指定类型不存在! ';
+            }
+        } catch (ClientException $e) {
     
-        $link = SECore::get()->getLink()->get('/'.$index.'/_mapping');
-        $data = json_decode($link->getBody(), true);
-        if (!array_key_exists($type, $data['link']['mappings'])) {
-            
-            $errMsg = '索引中指定类型不存在! ';
+            $errMsg = "索引无效: \n".$e->getMessage();
         }
-        // 类型检测
         // 错误时抛出异常强行结束请求器构建
         if ($errMsg !== '') {
     

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="css/search.css">
+    <title>湘大搜索demo</title>
+</head>
+<body>
+    <div id="home-page">
+        <img src="#" alt="湘大搜索" class="logo">
+        <div class="search">
+            <input type="text" class="key" v-model="searchInput">
+            <button class="submit" v-on:click="searchSubmit">搜索</button>
+        </div>
+        <div v-is="isAfterSearch">搜索关键字 {{searchKey}} 的结果为：</div>
+        <div class="d-list">
+            <!--<div class="d-item">-->
+                <!--<div class="d-title">标题标题标题</div>-->
+                <!--<div class="d-content">摘要摘要摘要摘要摘要摘要</div>-->
+                <!--<div class="d-pic">图片图片</div>-->
+                <!--<div class="d-time">xxxx-xx-xx</div>-->
+            <!--</div>-->
+            <!-- <d-item></d-item> -->
+        </div>
+    </div>
+    
+
+    <!-- 开发版本Vue -->
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <!-- 生产版本Vue -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.7/dist/vue.js"></script> -->
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script src="js/control.js"></script>
+</body>
+</html>

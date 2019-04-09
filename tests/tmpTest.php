@@ -11,9 +11,8 @@ class TmpTest extends TestCase
 
     public function testExample()
     {
-       $client = new Client([
-           'base_uri' => 'http://127.0.0.1:80'
-       ]);
-       print_r($client->get('/')->getBody());
+        
+        $query = new \SE\SEQuery\SEQuery('link1', '123');
+        assertTrue(true);
     }
 }

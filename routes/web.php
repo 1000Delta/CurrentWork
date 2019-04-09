@@ -10,6 +10,9 @@
 | and give it the Closure to call when that URI is requested.
 |
 */
+/**
+ * @var \Laravel\Lumen\Routing\Router $router
+ */
 
 $router->get('/', function () use ($router) {
     
@@ -17,19 +20,32 @@ $router->get('/', function () use ($router) {
 });
 
 /**
- * 搜索API，提供分页搜索功能
- * @api /search
- * path /api/search/
+ * @SWG\Swagger(
+ *     swagger="2.0"
+ *     schemes={"https"},
+ *     host="localhost",
+ *     basePath="/"
+ *     @SWG\Info(
+ *         version="1.0.0",
+ *         title="湘大文库API",
+ *         description="描述和测试湘大文库API"
+ *     )
+ * )
+ */
+
+/**
+ *
  */
 $router->get('/search/{key}[/{page}]', 'SearchController@search');
 
-/**
- * 更新API，对接爬虫进行数据更新
- * @api /update
- */
 $router->post('/update', 'UpdateController@update');
 
 $router->group(['middleware' => 'CorsMiddleware'], function () use ($router) {
     
     $router->get('/test', 'UpdateController@test');
 });
+
+/**
+ * 返回代码 return code
+ *
+ */

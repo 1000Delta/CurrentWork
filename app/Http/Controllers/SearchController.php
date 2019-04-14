@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use SE\SEQuery\SEData\SEDataLink;
 use SE\SEQuery\SEQuery;
 
 /**
@@ -29,18 +28,14 @@ class SearchController extends Controller
      */
     public function search($key, $page = 0) {
     
-        // 创建搜索映射
-        /**
-         * @var array 网站搜索映射
-         */
-        $sMap = SEDataLink::getMap($key);
-        $query = new SEQuery('my_index', 'my_type');
-        if ($page < 1) {
-            
-            return $query->search(env('ES_PAGE_SIZE'), $sMap);
-        } else {
-            
-            return $query->pageSearch($page*env('ES_PAGE_SIZE')-1, env('ES_PAGE_SIZE'), $sMap);
+        // 解码关键字
+        $key = urldecode($key);
+        // 防止错误页码
+        $query = new SEQuery('link', 'webPage');
+        if ($page < 0) {
+
+            $page = 0;
         }
+        return $query->pageSearch($page*env('ES_PAGE_SIZE')-1, env('ES_PAGE_SIZE'), $key);
     }
 }

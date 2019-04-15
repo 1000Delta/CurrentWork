@@ -1,0 +1,77 @@
+openapi: 3.0.0
+info:
+  title: 湘大文库API
+  description: 描述和测试湘大文库API
+  version: 1.0.0
+servers:
+  -
+    url: 'http://localhost'
+    description: 'API 服务器'
+
+tags:
+  -
+    name: search
+    description: 搜索相关
+  -
+    name: update
+    description: 更新数据相关
+  -
+    name: external
+    description: 额外接口
+
+
+paths:
+  /search/{key}:
+    get:
+      tags:
+        - search
+      summary: 分页搜索
+      description: 返回查询到的页面列表
+      operationId: searchWebPage
+      parameters:
+        -
+          name: key
+          in: path
+          description: 要搜索的关键词/句
+          required: true
+          schema:
+            type: string
+            default: 关键字
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#'
+        '400':
+          description: 查询失败
+  /update:
+    post:
+      tags:
+        - update
+      summary: 更新页面
+      description: 更新页面存储
+      operationId: update
+      parameters:
+        -
+          name: data
+          in: query
+          description: 要更新的数据条目
+          required: true
+          schema:
+            description: 数据项json字符串
+            type: json
+            default: '{''text'': '''',''keyword'':{},''note'': '''',''picurl'': '''',''tags'': {},''title'': {},''url'': {}}'
+
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#'

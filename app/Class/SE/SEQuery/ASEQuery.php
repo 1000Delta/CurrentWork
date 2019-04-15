@@ -8,11 +8,14 @@
 
 namespace SE\SEQuery;
 
-
-use GuzzleHttp\Exception\ClientException;
+use Illuminate\Support\Facades\Log;
 use SE\SECore\SECore;
 use SE\SEError\SEError;
 use SE\SEQuery\SEData\SEDataLink;
+// 引入异常类
+use \InvalidArgumentException;
+use \RuntimeException;
+use GuzzleHttp\Exception\ClientException;
 
 /**
  * Class ASEQuery 数据请求器
@@ -61,7 +64,7 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
         // 错误时抛出异常强行结束请求器构建
         if ($errMsg !== '') {
     
-            throw new \RuntimeException($errMsg);
+            throw new RuntimeException($errMsg);
         }
     }
 
@@ -72,22 +75,28 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
             // 检测数据是否匹配类型
             if (!SEDataLink::isMatch($data)) {
                 
-                throw new \InvalidArgumentException('传入数据与数据类型不匹配');
+                throw new InvalidArgumentException('传入数据与数据类型不匹配');
             }
-            $response = SECore::get()->getLink()->post(
-                '/'.$this->index.'/'.$this->type, [
-                 'json' => $data
-            ]);
-            $result = $response->getBody();
-            $json = json_decode($result, true);
-            if ($json['result'] != 'created') {
-
-                SEError::query($json);
-                return;
+            try {
+    
+                $response = SECore::get()->getLink()->post(
+                    '/'.$this->index.'/'.$this->type, [
+                    'json' => $data
+                ]);
+                $result = $response->getBody();
+                $json = json_decode($result, true);
+                if ($json['result'] != 'created') {
+        
+                    SEError::query($json);
+                    return;
+                }
+            } catch (ClientException $e) {
+                
+                Log::debug($e->getMessage());
             }
         } else {
         
-            throw new \InvalidArgumentException('实例未指定针对的索引或数据类型');
+            throw new InvalidArgumentException('实例未指定针对的索引或数据类型');
         }
     }
     
@@ -109,7 +118,7 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
             }
         } else {
 
-            throw new \InvalidArgumentException('实例未指定针对的索引或数据类型');
+            throw new InvalidArgumentException('实例未指定针对的索引或数据类型');
         }
     }
 
@@ -125,7 +134,7 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
             }
         } else {
     
-            throw new \InvalidArgumentException('实例未指定针对的索引或数据类型');
+            throw new InvalidArgumentException('实例未指定针对的索引或数据类型');
         }
     }
     
@@ -143,30 +152,52 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
             // 使用 SEDataLink 类型的静态方法
             $queryMap = SEDataLink::getSearchMap($key);
             // 最佳字段查询优化dis_max
-            $link = SECore::get()->getLink()->get($this->index.'/'.$this->type.'/_search?from='.$from.'&size='.$size, [
-                'json' => [
-                    'query' => [
-                        'dis_max' => [
-                            'queries' => $queryMap
+            try {
+    
+                $link = SECore::get()->getLink()->get(
+                    $this->index.'/'
+                    .$this->type
+                    .'/_search?from='.$from
+                    .'&size='.$size, [
+                    'json' => [
+                        'query' => [
+                            'dis_max' => [
+                                'queries' => $queryMap
+                            ]
                         ]
                     ]
-                ]
-            ]);
-            $data = json_decode($link->getBody(), true);
-            if (!array_key_exists('hits', $data)) {
-                // 返回成功查询的完整结果，由控制器进行后续处理
-                return $data['hits'];
+                ]);
+                $data = json_decode($link->getBody(), true);
+                if (array_key_exists('hits', $data)) {
+                    // 返回成功查询的完整结果，由控制器进行后续处理
+                    return $data['hits'];
+        
+                } else {
+        
+                    // 记录错误数据
+                    SEError::search($data);
+                }
+            } catch (ClientException $e) {
                 
-            } else {
-            
-                // 记录错误数据
-                SEError::query($data);
+                Log::debug($e->getMessage());
             }
         } else {
         
-            throw new \InvalidArgumentException('实例未指定针对的索引或数据类型');
+            throw new InvalidArgumentException('实例未指定针对的索引或数据类型');
         }
         // 错误结果默认抛出空数组
+        return [];
+    }
+    
+    public function suggest(string $key) {
+        // TODO: Implement suggest() method.
+        // 不查询空字符串
+        if ($key === '') {
+            
+            return [];
+        }
+        
+        // $link = SECore::get('/')
         return [];
     }
     

@@ -91,7 +91,8 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
                     return;
                 }
             } catch (ClientException $e) {
-                
+    
+                // TODO: 完善网络故障时故障处理
                 Log::debug($e->getMessage());
             }
         } else {
@@ -179,6 +180,7 @@ abstract class ASEQuery implements SEDataReader, SEDataWriter {
                 }
             } catch (ClientException $e) {
                 
+                // TODO: 完善网络故障时故障处理
                 Log::debug($e->getMessage());
             }
         } else {

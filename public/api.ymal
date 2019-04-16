@@ -45,7 +45,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#'
+                  $ref: '#/search/我'
         '400':
           description: 查询失败
   /update:
@@ -63,8 +63,8 @@ paths:
           required: true
           schema:
             description: 数据项json字符串
-            type: json
-            default: '{''text'': '''',''keyword'':{},''note'': '''',''picurl'': '''',''tags'': {},''title'': {},''url'': {}}'
+            type: string
+            default: '{"text": "","keyword":{},"note": "","picurl": "","tags": {},"title": {},"url": {}}'
 
       responses:
         '200':

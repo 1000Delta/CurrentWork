@@ -107,7 +107,6 @@ $router->get('/search/{key}[/{page}]', 'SearchController@search');
  *         required=true,
  *         @OA\Schema(
  *             type="json",
-
  *             default="{'text': '','keyword':{},'note': '','picurl': '','tags': {},'title': {},'url': {}}",
  *             description="数据项json字符串",
  *         ),

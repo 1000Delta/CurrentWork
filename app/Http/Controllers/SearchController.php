@@ -36,6 +36,10 @@ class SearchController extends Controller
 
             $page = 0;
         }
-        return $query->pageSearch($page*env('ES_PAGE_SIZE')-1, env('ES_PAGE_SIZE'), $key);
+        return [
+            'code' => 0,
+            'msg' => '查询成功',
+            'data' => $query->pageSearch($page*env('ES_PAGE_SIZE'), env('ES_PAGE_SIZE'), $key)
+        ];
     }
 }

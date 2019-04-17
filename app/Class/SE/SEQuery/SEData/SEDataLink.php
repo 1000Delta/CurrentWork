@@ -10,7 +10,7 @@ namespace SE\SEQuery\SEData;
 
 
 final class SEDataLink implements ISEData {
-
+    
     private static $keyList = [
         'keyword' => '',
         'title' => '',
@@ -18,13 +18,17 @@ final class SEDataLink implements ISEData {
         'intro' => '',
         'content' => '',
         'tags' => '',
-        'note' => ''
+        'note' => '',
+        'picurl' => ''
     ];
     
     public static function getSearchMap($key) {
 
        $keymap = [];
        foreach (self::$keyList as $k => $v) {
+           
+           // 查询不包括图片链接
+           if ($k === 'picurl') continue;
            
            $keymap[] = ['match' => [$k => $key]];
        }

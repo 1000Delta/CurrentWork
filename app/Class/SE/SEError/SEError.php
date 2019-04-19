@@ -15,17 +15,17 @@ class SEError implements ISEError {
 
     public static function query($rtnData) {
 
-        Log::error('result: '.$rtnData['result'], $rtnData);
+        Log::error('query.result: ', $rtnData);
     }
     
     public static function search($rtnData) {
 
-        Log::error('result: ', $rtnData);
+        Log::error('search.result: ', $rtnData);
         
     }
     
     public static function cluster($rtnData) {
 
-        Log::error('result: '.$rtnData['result'], $rtnData);
+        Log::error('cluster.result: ', $rtnData);
     }
 }

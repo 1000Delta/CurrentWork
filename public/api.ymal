@@ -39,15 +39,11 @@ paths:
             default: 关键字
       responses:
         '200':
-          description: 查询成功
+          description: 返回查询到的结果
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/search/我'
-        '400':
-          description: 查询失败
+                $ref: '#/components/schemas/search'
   /update:
     post:
       tags:
@@ -55,17 +51,32 @@ paths:
       summary: 更新页面
       description: 更新页面存储
       operationId: update
-      parameters:
-        -
-          name: data
-          in: query
-          description: 要更新的数据条目
-          required: true
-          schema:
-            description: 数据项json字符串
-            type: string
-            default: '{"text": "","keyword":{},"note": "","picurl": "","tags": {},"title": {},"url": {}}'
-
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                keyword:
+                  type: array
+                  items:
+                    type: string
+                content:
+                  type: string
+                picurl:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+                intro:
+                  type: string
+                url:
+                  type: string
+                note:
+                  type: string
       responses:
         '200':
           description: 查询成功
@@ -74,4 +85,88 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#'
+                  $ref: '#/components/schemas/update'
+
+components:
+  schemas:
+    search:
+      properties:
+        code:
+          type: integer
+          description: api返回值
+          example: 0
+        msg:
+          type: string
+          description: 返回信息
+          example: 查询成功
+        data:
+          type: object
+          properties:
+            total:
+              type: string
+              description: 结果总数
+              example: 1
+            max_score:
+              type: number
+              description: 最大匹配评分
+              example: 0.2876821
+            hits:
+              type: object
+              description: 查询结果集
+              properties:
+                _index:
+                  type: string
+                _type:
+                  type: string
+                  example: "webPage"
+                _id:
+                  type: string
+                  example: "U3G_IWoBRObftyg5KFSP"
+                _score:
+                  type: number
+                  example: 0.2876821
+                _source:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                      example: "我的测试"
+                    keyword:
+                      type: array
+                      items:
+                        type: string
+                        example: [
+                          "测试",
+                          "更新"
+                        ]
+                    "tags":
+                      type: string
+                      example: [
+                        "测试",
+                        "我"
+                      ]
+                    intro:
+                      type: string
+                      example: "一个用于测试的样例数据"
+                    content:
+                      type: string
+                      example: "测试测试测试一个测试有用的测试"
+                    url":
+                      type: string
+                      example: "localhost/test"
+                    picurl:
+                      type: string
+                      example: ""
+                    note:
+                      type: string
+                      example: ""
+    update:
+      properties:
+        code:
+          type: integer
+          description: api返回值
+          example: 0
+        msg:
+          type: string
+          description: 返回信息
+          example: 查询成功

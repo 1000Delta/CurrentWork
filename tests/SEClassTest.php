@@ -27,6 +27,9 @@ class SEClassTest extends TestCase {
         return $core;
     }
     
+    /**
+     * @depends testSECore
+     */
     public function testSEMonitor() {
         
         $monitor = new \SE\SEMonitor\SEMonitor();
@@ -65,15 +68,18 @@ class SEClassTest extends TestCase {
     
     /** 测试 SECore 类
      * @depends testSECore
-     * @param SECore $core 测试基境中依赖变量
      */
-    public function testSEQuery(SECore $core) {
+    public function testSEQuery() {
         
-        $this->assertTrue(true);
-//        $query = new \SE\SEQuery\SEQuery();
-        $response = $core->getLink()->get('_cluster/health');
-        echo $response->getBody();
-        
+        // 构建查询json组
+        $queryMap = SEDataLink::getSearchMap('我');
+        // 查询
+        $query = new SEQuery('link', 'webPage');
+        $res = $query->search(5, '我');
+        // 字段存在性断言
+        $this->assertArrayHasKey('total', $res, '结果总数数组');
+        $this->assertArrayHasKey('max_score', $res, '结果相关性最大值');
+        $this->assertArrayHasKey('hits', $res, '查询结果数组');
     }
     
     public function testSESetting() {
@@ -81,6 +87,9 @@ class SEClassTest extends TestCase {
         self::assertTrue(true);
     }
     
+    /**
+     * @depends testSECore
+     */
     public function testSEError() {
         
         $query = new SEQuery('my_store', 'products');

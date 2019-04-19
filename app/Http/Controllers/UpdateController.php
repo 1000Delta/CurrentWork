@@ -11,7 +11,8 @@ class UpdateController extends Controller
 
     public function update(Request $request) {
     
-        if ($request->has('data')) {
+        $data = json_decode($request->getContent(), true);
+        if ($data === '') {
             
             return [
                 'code' => 1,
@@ -21,20 +22,22 @@ class UpdateController extends Controller
         
         // 创建数据写入器
         $query = new SEQuery('link', 'webPage');
-        $data = $request->get('data');
         
         // 数据类型匹配
         if (!SEDataLink::isMatch($data)) {
         
             return [
                 'code' => 1,
-                'msg' => '数据项有误'
+                'msg' => '数据项有误',
+                'data' => $data,
+                'StdData' => SEDataLink::getKeyMap()
             ];
         }
         $query->add($data);
         
         return [
-            "code" => 0
+            'code' => 0,
+            'msg' => '数据更新成功'
         ];
     }
     

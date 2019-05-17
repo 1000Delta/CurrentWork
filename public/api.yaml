@@ -5,8 +5,8 @@ info:
   version: 1.0.0
 servers:
   -
-    url: 'http://localhost'
-    description: 'API 服务器'
+    url: 'http://search.localhost'
+    description: '本地 API 服务器'
 
 tags:
   -
@@ -25,9 +25,9 @@ paths:
     get:
       tags:
         - search
-      summary: 分页搜索
+      summary: 普通搜索
       description: 返回查询到的页面列表
-      operationId: searchWebPage
+      operationId: singleSearch
       parameters:
         -
           name: key
@@ -44,6 +44,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/search'
+  /search/{key}/{page}:
+    get:
+      tags:
+        -search
+      sammary: 分页搜索
+      description: 返回根据关键字查询结果的指定页面
+      operetionId: pageSearch
+      parameters:
+        -
+          name: key
+          in: path
+          description: 搜索关键字
+          required: true
+          schema:
+            type: string
+            default: 关键字
+        -
+          name: page
+          in: path
   /update:
     post:
       tags:

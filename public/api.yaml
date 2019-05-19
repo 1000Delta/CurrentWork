@@ -47,7 +47,7 @@ paths:
   /search/{key}/{page}:
     get:
       tags:
-        -search
+        - search
       sammary: 分页搜索
       description: 返回根据关键字查询结果的指定页面
       operetionId: pageSearch
@@ -63,6 +63,11 @@ paths:
         -
           name: page
           in: path
+          description: 页码
+          required: true
+          schema:
+            type: integer
+            default: 0
   /update:
     post:
       tags:
